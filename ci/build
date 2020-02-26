@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 export WORKSPACE=${WORKSPACE:-$(pwd)}
 export PATH="$PATH:$WORKSPACE/bin"
@@ -8,16 +8,46 @@ git clean -ffdx
 source /usr/local/rvm/scripts/rvm
 rvm use 2.5.1
 
-set -x
+set -ex
 
 # From https://github.com/fossas/fossa-cli
 fossa_install_script=https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh
+
 target_binary_directory="$WORKSPACE/bin"
 temporary_directory="$WORKSPACE/tmp"
 repo_list="$WORKSPACE/ci/repo_list"
-failures=0
-failed_repos_list="$temporary_directory/failed_repos"
 
+## Keep a git_sha file so that we don't do unneeded scans
+git_sha_file_url=https://artifactory.delivery.puppetlabs.net/artifactory/scratchpad__local/fossa-scan-pe/git_sha_file.txt
+original_git_sha_file_path="$temporary_directory/original_git_sha_file.txt"
+updated_git_sha_file_path="$temporary_directory/git_sha_file.txt"
+
+function fetch_git_sha_file() {
+  wget --quiet --tries=3 --output-file="$original_git_sha_file_path"
+  touch "$original_git_sha_file_path"
+}
+
+function upload_git_sha_file() {
+  # ARTIFACTORY_API_TOKEN is a secret passed by Jenkins through the environment
+  curl --header "X-JFrog-Art-Api:$ARTIFACTORY_API_TOKEN" \
+       --upload-file "updated_git_sha_file_path" \
+       $git_sha_file_url
+}
+
+function original_git_sha() {
+  repo_name=$1
+  set +e
+  grep "^$repo_name," "$original_git_sha_file_path" | awk -F, '{ print $2 }'
+  set -e
+}
+
+function new_git_sha() {
+  repo_name=$1
+  git_sha=$2
+  echo "$repo_name,$git_sha" >> "$updated_git_sha_file_path"
+}
+
+## Set up lein if needed
 function configure_lein() {
   lein_version=${1:-2.9.1}
 
@@ -26,39 +56,50 @@ function configure_lein() {
     return
   fi
 
-  : === Info: Installing leiningen version $lein_version
+  : === Info: Installing leiningen version "$lein_version"
   lein_source_url=https://raw.githubusercontent.com/technomancy/leiningen/$lein_version/bin/lein
-  lein_script_path=$target_binary_directory/lein
-  mkdir --parents $target_binary_directory
-  curl --fail --insecure --location --output $lein_script_path \
-       https://raw.githubusercontent.com/technomancy/leiningen/$lein_version/bin/lein
+  lein_script_path="$target_binary_directory/lein"
+  mkdir --parents "$target_binary_directory"
+  curl --fail --insecure --location --output "$lein_script_path" \
+       https://raw.githubusercontent.com/technomancy/leiningen/"$lein_version"/bin/lein
 
   if [[ ! -r $lein_script_path ]]; then
-    : === Error: lein curl $lein_source_url failed.
+    : === Error: lein curl "$lein_source_url" failed.
     exit 1
   fi
 
-  chmod 755 $lein_script_path
+  chmod 755 "$lein_script_path"
   export LEIN=$lein_script_path
 }
-
 
 mkdir --parents "$target_binary_directory"
 mkdir --parents "$temporary_directory"
 
-curl -H 'Cache-Control: no-cache' $fossa_install_script > $target_binary_directory/install.sh
-/bin/bash $target_binary_directory/install.sh -b $target_binary_directory
+curl -H 'Cache-Control: no-cache' $fossa_install_script > "$target_binary_directory"/install.sh
+/bin/bash "$target_binary_directory"/install.sh -b "$target_binary_directory"
 
 hash -r
 
+set +e
+# It's OK if this fails. It's nice to have but not essential
+fetch_git_sha_file
+set -e
 
-for repo_url in $(cat $repo_list); do
+while read -r repo_url; do
   : ===
-  : === Info: Analyzing $repo_url
+  : === Info: Analyzing "$repo_url"
   : ===
-  repo_directory="$WORKSPACE/$(basename $repo_url .git)"
-  git clone --recursive $repo_url $repo_directory
-  builtin cd $repo_directory
+  repo_directory="$WORKSPACE/$(basename "$repo_url" .git)"
+  git clone --recursive "$repo_url" "$repo_directory"
+  builtin cd "$repo_directory"
+
+  current_sha=$(git rev-parse HEAD)
+  former_sha=$(original_git_sha "$repo_url")
+  new_git_sha "$repo_url" "$current_sha"
+  if [[ "$current_sha" == "$former_sha" ]]; then
+    : === Info: No git changes in "$repo_url" since last run, no need to re-analyze.
+    continue
+  fi
 
   if [[ -r project.clj ]]; then
     configure_lein
@@ -73,22 +114,13 @@ for repo_url in $(cat $repo_list); do
 
     bundle install
   fi
+
   set +e
   fossa init
   fossa analyze
-  # fossa test
-  if [[ $? != 0 ]]; then
-     : ===
-     : === Warning: FOSSA found issues analyzing $repo_url
-     : ===
-  fi
   set -e
-  builtin cd $WORKSPACE
-done
+  builtin cd "$WORKSPACE"
+done < "$repo_list"
 
-set +x
-if [[ $failures != 0 ]]; then
-  echo "=== Info: $failures failures found. Failed repos are:"
-  cat $failed_repos_list
-fi
-
+set +e
+upload_git_sha_file
