@@ -23,7 +23,7 @@ original_git_sha_file_path="$temporary_directory/original_git_sha_file.txt"
 updated_git_sha_file_path="$temporary_directory/git_sha_file.txt"
 
 function fetch_git_sha_file() {
-  wget --quiet --tries=3 --output-file="$original_git_sha_file_path"
+  wget --quiet --tries=3 --output-file="$original_git_sha_file_path" "$git_sha_file_url"
   touch "$original_git_sha_file_path"
 }
 
