@@ -30,7 +30,7 @@ function fetch_git_sha_file() {
 function upload_git_sha_file() {
   # ARTIFACTORY_API_TOKEN is a secret passed by Jenkins through the environment
   curl --header "X-JFrog-Art-Api:$ARTIFACTORY_API_TOKEN" \
-       --upload-file "updated_git_sha_file_path" \
+       --upload-file "$updated_git_sha_file_path" \
        $git_sha_file_url
 }
 
