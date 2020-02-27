@@ -21,6 +21,7 @@ repo_list="$WORKSPACE/ci/repo_list"
 git_sha_file_url=https://artifactory.delivery.puppetlabs.net/artifactory/scratchpad__local/fossa-scan-pe/git_sha_file.txt
 original_git_sha_file_path="$temporary_directory/original_git_sha_file.txt"
 updated_git_sha_file_path="$temporary_directory/git_sha_file.txt"
+repos_in_error="$temporary_directory/repos_in_error"
 
 function fetch_git_sha_file() {
   wget --quiet --tries=3 --output-document="$original_git_sha_file_path" "$git_sha_file_url"
@@ -47,6 +48,14 @@ function new_git_sha() {
   echo "$repo_name,$git_sha" >> "$updated_git_sha_file_path"
 }
 
+function remove_git_sha() {
+  ## We want to force a re-test of something
+  repo_name=$1
+  grep --fixed-strings --invert-match \
+       "$repo_name," "$updated_git_sha_file_path" > "$updated_git_sha_file_path.new"
+  mv "$updated_git_sha_file_path.new" "$updated_git_sha_file_path"
+}
+
 ## Set up lein if needed
 function configure_lein() {
   lein_version=${1:-2.9.1}
@@ -56,7 +65,9 @@ function configure_lein() {
     return
   fi
 
+  : ===
   : === Info: Installing leiningen version "$lein_version"
+  : ===
   lein_source_url=https://raw.githubusercontent.com/technomancy/leiningen/$lein_version/bin/lein
   lein_script_path="$target_binary_directory/lein"
   mkdir --parents "$target_binary_directory"
@@ -97,7 +108,9 @@ while read -r repo_url; do
   former_sha=$(original_git_sha "$repo_url")
   new_git_sha "$repo_url" "$current_sha"
   if [[ "$current_sha" == "$former_sha" ]]; then
+    : ===
     : === Info: No git changes in "$repo_url" since last run, no need to re-analyze.
+    : ===
     continue
   fi
 
@@ -115,12 +128,34 @@ while read -r repo_url; do
     bundle install
   fi
 
+  fossa_log="$temporary_directory/$(basename "$repo_url" .git).log"
   set +e
-  fossa init
-  fossa analyze
+  fossa init 2>&1 | tee --append "$fossa_log"
+  fossa analyze 2>&1 | tee --append "$fossa_log"
+  if grep --silent "^FATAL " "$fossa_log"; then
+    echo "$repo_url" >> "$repos_in_error"
+    remove_git_sha "$repo_url"
+  fi
   set -e
   builtin cd "$WORKSPACE"
 done < "$repo_list"
 
-set +e
+set +ex
+
 upload_git_sha_file
+
+if [[ ! -r "$repos_in_error" ]]; then
+  exit 0
+fi
+
+echo "
+=========================
+Error Report
+=========================
+"
+
+while read -r repo_url; do
+  echo "======  $repo_url: "
+  cat "$temporary_directory/$(basename "$repo_url" .git).log"
+  echo -e "\n\n"
+done < "$repos_in_error"
