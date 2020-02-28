@@ -159,3 +159,5 @@ while read -r repo_url; do
   cat "$temporary_directory/$(basename "$repo_url" .git).log"
   echo -e "\n\n"
 done < "$repos_in_error"
+exit 1
+
