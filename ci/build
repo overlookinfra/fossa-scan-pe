@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export BUNDLE_PATH=".bundle/gems"
+export BUNDLE_BIN=".bundle/bin"
 export WORKSPACE=${WORKSPACE:-$(pwd)}
 export PATH="$PATH:$WORKSPACE/bin"
 
@@ -61,11 +63,9 @@ function bundle_install_everything() {
   for gemfile in $(find . -name Gemfile); do
     gemfile_directory=$(dirname $gemfile)
     builtin cd $gemfile_directory
-    export BUNDLE_PATH="$gemfile_directory/.bundle/gems"
-    export BUNDLE_BIN="$gemfile_directory/.bundle/bin"
     bundle install
+    builtin cd $original_directory
   done
-  builtin cd $original_directory
 }
 
 ## Set up lein if needed
