@@ -56,6 +56,18 @@ function remove_git_sha() {
   mv "$updated_git_sha_file_path.new" "$updated_git_sha_file_path"
 }
 
+function bundle_install_everything() {
+  original_directory=$(pwd)
+  for gemfile in $(find "$WORKSPACE" -name Gemfile); do
+    gemfile_directory=$(dirname $gemfile)
+    builtin cd $gemfile_directory
+    export BUNDLE_PATH="$gemfile_directory/.bundle/gems"
+    export BUNDLE_BIN="$gemfile_directory/.bundle/bin"
+    bundle_install
+  done
+  builtin cd $original_directory
+}
+
 ## Set up lein if needed
 function configure_lein() {
   lein_version=${1:-2.9.1}
@@ -118,15 +130,7 @@ while read -r repo_url; do
     configure_lein
   fi
 
-  if [[ -r Gemfile ]]; then
-    export BUNDLE_PATH="$repo_directory/bundle/gems"
-    export BUNDLE_BIN="$repo_directory/bundle/bin"
-
-    mkdir --parents "$BUNDLE_PATH"
-    mkdir --parents "$BUNDLE_BIN"
-
-    bundle install
-  fi
+  bundle_install_everything
 
   fossa_log="$temporary_directory/$(basename "$repo_url" .git).log"
   set +e
@@ -160,4 +164,3 @@ while read -r repo_url; do
   echo -e "\n\n"
 done < "$repos_in_error"
 exit 1
-
