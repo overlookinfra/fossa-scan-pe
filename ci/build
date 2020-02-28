@@ -58,7 +58,7 @@ function remove_git_sha() {
 
 function bundle_install_everything() {
   original_directory=$(pwd)
-  for gemfile in $(find "$WORKSPACE" -name Gemfile); do
+  for gemfile in $(find . -name Gemfile); do
     gemfile_directory=$(dirname $gemfile)
     builtin cd $gemfile_directory
     export BUNDLE_PATH="$gemfile_directory/.bundle/gems"
