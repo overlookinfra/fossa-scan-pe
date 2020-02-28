@@ -63,7 +63,7 @@ function bundle_install_everything() {
     builtin cd $gemfile_directory
     export BUNDLE_PATH="$gemfile_directory/.bundle/gems"
     export BUNDLE_BIN="$gemfile_directory/.bundle/bin"
-    bundle_install
+    bundle install
   done
   builtin cd $original_directory
 }
