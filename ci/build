@@ -63,7 +63,9 @@ function bundle_install_everything() {
     builtin cd $gemfile_directory
     export BUNDLE_PATH="$gemfile_directory/.bundle/gems"
     export BUNDLE_BIN="$gemfile_directory/.bundle/bin"
-    bundle install
+    if ! bundle install; then
+      return 1
+    fi
   done
   builtin cd $original_directory
 }
@@ -130,10 +132,19 @@ while read -r repo_url; do
     configure_lein
   fi
 
-  bundle_install_everything
-
-  fossa_log="$temporary_directory/$(basename "$repo_url" .git).log"
   set +e
+  fossa_log="$temporary_directory/$(basename "$repo_url" .git).log"
+
+  if ! bundle_install_everything >> "$fossa_log" 2>&1; then
+    : ===
+    : === Error: "'bundle install' failed in $repo_url"
+    : ===
+    echo "$repo_url" >> "$repos_in_error"
+    remove_git_sha "$repo_url"
+    cat "$fossa_log"
+    continue
+  fi
+
   fossa init 2>&1 | tee --append "$fossa_log"
   fossa analyze 2>&1 | tee --append "$fossa_log"
   if grep --silent "^FATAL " "$fossa_log"; then
