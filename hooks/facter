@@ -1,0 +1,11 @@
+##
+## FOSSA analyze hooks for facter
+##
+
+function build_hook() {
+  mkdir release
+  builtin cd release
+  cmake ..
+  make
+  builtin cd ..
+}

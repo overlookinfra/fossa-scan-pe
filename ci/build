@@ -17,6 +17,8 @@ target_binary_directory="$WORKSPACE/bin"
 temporary_directory="$WORKSPACE/tmp"
 repo_list="$WORKSPACE/ci/repo_list"
 
+
+
 ## Keep a git_sha file so that we don't do unneeded scans
 git_sha_file_url=https://artifactory.delivery.puppetlabs.net/artifactory/scratchpad__local/fossa-scan-pe/git_sha_file.txt
 original_git_sha_file_path="$temporary_directory/original_git_sha_file.txt"
@@ -58,16 +60,16 @@ function remove_git_sha() {
 
 function bundle_install_everything() {
   original_directory=$(pwd)
-  for gemfile in $(find "$original_directory" -name Gemfile); do
-    gemfile_directory=$(dirname $gemfile)
-    builtin cd $gemfile_directory
+  while read -r gemfile; do
+    gemfile_directory=$(dirname "$gemfile")
+    builtin cd "$gemfile_directory"
     export BUNDLE_PATH="$gemfile_directory/.bundle/gems"
     export BUNDLE_BIN="$gemfile_directory/.bundle/bin"
     if ! bundle install; then
       return 1
     fi
-  done
-  builtin cd $original_directory
+  done < <(find "$original_directory" -name Gemfile)
+  builtin cd "$original_directory"
 }
 
 ## Set up lein if needed
@@ -97,6 +99,25 @@ function configure_lein() {
   export LEIN=$lein_script_path
 }
 
+## Overridable repo-specific hook functions
+function pre_build_hook() {
+  repo_url="$1"
+
+  if [[ -r project.clj ]]; then
+    configure_lein
+  fi
+  if ! bundle_install_everything >> "$fossa_log" 2>&1; then
+    : ===
+    : === Error: "'bundle install' failed in $repo_url"
+    : ===
+    return 1
+  fi
+}
+function build_hook() { true; }
+function fossa_hook() { fossa; }
+function post_build_hook() { true; }
+
+
 mkdir --parents "$target_binary_directory"
 mkdir --parents "$temporary_directory"
 
@@ -111,10 +132,14 @@ fetch_git_sha_file
 set -e
 
 while read -r repo_url; do
+  repo_basename="$(basename "$repo_url" .git)"
+  repo_directory="$WORKSPACE/$repo_basename"
+  hook_file="$WORKSPACE/hooks/$repo_basename"
+  fossa_log="$temporary_directory/$repo_basename.log"
+
   : ===
   : === Info: Analyzing "$repo_url"
   : ===
-  repo_directory="$WORKSPACE/$(basename "$repo_url" .git)"
   git clone --recursive "$repo_url" "$repo_directory"
   builtin cd "$repo_directory"
 
@@ -128,32 +153,33 @@ while read -r repo_url; do
     continue
   fi
 
-  if [[ -r project.clj ]]; then
-    configure_lein
+  if [[ -r "$hook_file" ]]; then
+    source "$hook_file"
   fi
 
-  set +e
-  fossa_log="$temporary_directory/$(basename "$repo_url" .git).log"
-
-  if ! bundle_install_everything >> "$fossa_log" 2>&1; then
-    : ===
-    : === Error: "'bundle install' failed in $repo_url"
-    : ===
+  if ! pre_build_hook "$repo_url" >> "$fossa_log" 2>&1; then
     echo "$repo_url" >> "$repos_in_error"
     remove_git_sha "$repo_url"
     cat "$fossa_log"
     continue
   fi
 
-  fossa init 2>&1 | tee --append "$fossa_log"
-  fossa analyze 2>&1 | tee --append "$fossa_log"
+  if ! build_hook "$repo_url" >> "$fossa_log" 2>&1; then
+    echo "$repo_url" >> "$repos_in_error"
+    remove_git_sha "$repo_url"
+    cat "$fossa_log"
+    continue
+  fi
+
+  set +e
+  fossa_hook "$repo_url" 2>&1 | tee --append "$fossa_log"
   if grep --silent "^FATAL " "$fossa_log"; then
     echo "$repo_url" >> "$repos_in_error"
     remove_git_sha "$repo_url"
   fi
   set -e
   builtin cd "$WORKSPACE"
-done < "$repo_list"
+done < <(grep --invert-match '^#' "$repo_list")
 
 set +ex
 
