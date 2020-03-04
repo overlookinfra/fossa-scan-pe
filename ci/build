@@ -1,5 +1,15 @@
 #!/bin/bash
-
+##
+## ci build script for FOSSA analysis
+##
+## Reads "repo_list" file for list of repos to analyze
+## Loads any repo-specific hook file for building before analysis
+## Calls pre_build_hook, build_hook, and fossa_hook to perform local build and analysis
+## Records results and print errors.
+## Keeps a state file (on Artifactory) so repeated work isn't repeated. The state file
+##   isn't required for operation; it is merely a time-saving convenience. Remove it from
+##   Artifactory if it ever becomes corrupted
+##
 export WORKSPACE=${WORKSPACE:-$(pwd)}
 export PATH="$PATH:$WORKSPACE/bin"
 
@@ -10,14 +20,18 @@ rvm use 2.5.1
 
 set -ex
 
+# This is the script that will install FOSSA binary locally
 # From https://github.com/fossas/fossa-cli
 fossa_install_script=https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh
 
+# Local directory definitions
 target_binary_directory="$WORKSPACE/bin"
 temporary_directory="$WORKSPACE/tmp"
+hook_directory="$WORKSPACE/hooks"
+
+# Local file definitions
+
 repo_list="$WORKSPACE/ci/repo_list"
-
-
 
 ## Keep a git_sha file so that we don't do unneeded scans
 git_sha_file_url=https://artifactory.delivery.puppetlabs.net/artifactory/scratchpad__local/fossa-scan-pe/git_sha_file.txt
@@ -25,11 +39,13 @@ original_git_sha_file_path="$temporary_directory/original_git_sha_file.txt"
 updated_git_sha_file_path="$temporary_directory/git_sha_file.txt"
 repos_in_error="$temporary_directory/repos_in_error"
 
+# Retrieve the git_sha_file from Artifactory
 function fetch_git_sha_file() {
   wget --quiet --tries=3 --output-document="$original_git_sha_file_path" "$git_sha_file_url"
   touch "$original_git_sha_file_path"
 }
 
+# Post an updated git_sha_file back to Artifactory
 function upload_git_sha_file() {
   # ARTIFACTORY_API_TOKEN is a secret passed by Jenkins through the environment
   curl --header "X-JFrog-Art-Api:$ARTIFACTORY_API_TOKEN" \
@@ -37,6 +53,7 @@ function upload_git_sha_file() {
        $git_sha_file_url
 }
 
+# Given a repo name, retrieve the stored git sha
 function original_git_sha() {
   repo_name=$1
   set +e
@@ -44,20 +61,23 @@ function original_git_sha() {
   set -e
 }
 
+# Store a new git sha with a repo name into the git_sha file
 function new_git_sha() {
   repo_name=$1
   git_sha=$2
   echo "$repo_name,$git_sha" >> "$updated_git_sha_file_path"
 }
 
+# Remove a git_sha from the git_sha_file. This is useful if we want to force re-testing
+# in a future invocation.
 function remove_git_sha() {
-  ## We want to force a re-test of something
   repo_name=$1
   grep --fixed-strings --invert-match \
        "$repo_name," "$updated_git_sha_file_path" > "$updated_git_sha_file_path.new"
   mv "$updated_git_sha_file_path.new" "$updated_git_sha_file_path"
 }
 
+# Recurse through the current repo, doing a 'bundle install' wherever we find a Gemfile.
 function bundle_install_everything() {
   original_directory=$(pwd)
   while read -r gemfile; do
@@ -99,28 +119,13 @@ function configure_lein() {
   export LEIN=$lein_script_path
 }
 
-## Overridable repo-specific hook functions
-function pre_build_hook() {
-  repo_url="$1"
-
-  if [[ -r project.clj ]]; then
-    configure_lein
-  fi
-  if ! bundle_install_everything >> "$fossa_log" 2>&1; then
-    : ===
-    : === Error: "'bundle install' failed in $repo_url"
-    : ===
-    return 1
-  fi
-}
-function build_hook() { true; }
-function fossa_hook() { fossa; }
-function post_build_hook() { true; }
-
+## Fetch the default hooks.
+source "$hook_directory/default"
 
 mkdir --parents "$target_binary_directory"
 mkdir --parents "$temporary_directory"
 
+## Install FOSSA CLI locally
 curl -H 'Cache-Control: no-cache' $fossa_install_script > "$target_binary_directory"/install.sh
 /bin/bash "$target_binary_directory"/install.sh -b "$target_binary_directory"
 
@@ -131,10 +136,11 @@ set +e
 fetch_git_sha_file
 set -e
 
+## Main loop. Process all the repos.
 while read -r repo_url; do
   repo_basename="$(basename "$repo_url" .git)"
   repo_directory="$WORKSPACE/$repo_basename"
-  hook_file="$WORKSPACE/hooks/$repo_basename"
+  hook_file="$hook_directory/$repo_basename"
   fossa_log="$temporary_directory/$repo_basename.log"
 
   : ===

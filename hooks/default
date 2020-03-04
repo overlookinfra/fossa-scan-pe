@@ -1,0 +1,27 @@
+##
+## Default hooks for pre_build, build, and fossa invocation
+##
+
+## pre_build_hook handles local provisioning of build tools and files.
+## It could also be for any needed fossa-specific configuration.
+function pre_build_hook() {
+  repo_url="$1"
+
+  if [[ -r project.clj ]]; then
+    configure_lein
+  fi
+  if ! bundle_install_everything >> "$fossa_log" 2>&1; then
+    : ===
+    : === Error: "'bundle install' failed in $repo_url"
+    : ===
+    return 1
+  fi
+}
+
+## build_hooks is mostly for compiled or combined builds that require make/Rake invocation
+## to bring scannable items into the build directory
+function build_hook() { true; }
+
+## This should work for most cases but can be changed locally should fossa require additional
+## command-line flags
+function fossa_hook() { fossa; }
