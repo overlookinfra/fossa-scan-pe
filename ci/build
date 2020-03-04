@@ -20,9 +20,6 @@ rvm use 2.5.1
 
 set -ex
 
-# This is the script that will install FOSSA binary locally
-# From https://github.com/fossas/fossa-cli
-fossa_install_script=https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh
 
 # Local directory definitions
 target_binary_directory="$WORKSPACE/bin"
@@ -119,22 +116,29 @@ function configure_lein() {
   export LEIN=$lein_script_path
 }
 
+function install_fossa_cli() {
+  # This is the script that will install FOSSA binary locally
+  # From https://github.com/fossas/fossa-cli
+  fossa_install_script=https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh
+
+  curl --header 'Cache-Control:no-cache' $fossa_install_script > \
+       "$target_binary_directory"/install.sh
+  /bin/bash "$target_binary_directory"/install.sh -b "$target_binary_directory"
+  hash -r
+}
+
 ## Fetch the default hooks.
 source "$hook_directory/default"
 
 mkdir --parents "$target_binary_directory"
 mkdir --parents "$temporary_directory"
 
-## Install FOSSA CLI locally
-curl -H 'Cache-Control: no-cache' $fossa_install_script > "$target_binary_directory"/install.sh
-/bin/bash "$target_binary_directory"/install.sh -b "$target_binary_directory"
-
-hash -r
-
 set +e
-# It's OK if this fails. It's nice to have but not essential
+# It's OK if this fails.
 fetch_git_sha_file
 set -e
+
+install_fossa_cli
 
 ## Main loop. Process all the repos.
 while read -r repo_url; do
