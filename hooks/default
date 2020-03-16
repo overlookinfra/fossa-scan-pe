@@ -10,6 +10,8 @@ function pre_build_hook() {
   if [[ -r project.clj ]]; then
     configure_lein
   fi
+
+  return 0
   if ! bundle_install_everything >> "$fossa_log" 2>&1; then
     : ===
     : === Error: "'bundle install' failed in $repo_url"
