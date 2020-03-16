@@ -127,8 +127,6 @@ function install_fossa_cli() {
   hash -r
 }
 
-## Fetch the default hooks.
-source "$hook_directory/default"
 
 mkdir --parents "$target_binary_directory"
 mkdir --parents "$temporary_directory"
@@ -164,7 +162,11 @@ while read -r repo_url; do
   fi
 
   if [[ -r "$hook_file" ]]; then
+    # Use the repo-specific hooks
     source "$hook_file"
+  else
+    # Use the default hooks
+    source "$hook_directory/default"
   fi
 
   if ! pre_build_hook "$repo_url" >> "$fossa_log" 2>&1; then
