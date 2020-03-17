@@ -12,7 +12,7 @@
 ##
 export WORKSPACE=${WORKSPACE:-$(pwd)}
 export PATH="$PATH:$WORKSPACE/bin"
-export GEM_SOURCE=https://rubygems.org
+export GEM_SOURCE=https://artifactory.delivery.puppetlabs.net/artifactory/api/gems/rubygems/
 
 git clean -ffdx
 
