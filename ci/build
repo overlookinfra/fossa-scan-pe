@@ -161,12 +161,13 @@ while read -r repo_url; do
     continue
   fi
 
+  # Set up default hooks
+  source "$hook_directory/default"
+
+  # Apply hook overrides
   if [[ -r "$hook_file" ]]; then
-    # Use the repo-specific hooks
+    : === Using "$hook_file"
     source "$hook_file"
-  else
-    # Use the default hooks
-    source "$hook_directory/default"
   fi
 
   if ! pre_build_hook "$repo_url" >> "$fossa_log" 2>&1; then
