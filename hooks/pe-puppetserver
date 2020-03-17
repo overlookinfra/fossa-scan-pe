@@ -1,0 +1,8 @@
+function pre_build_hook() {
+  git checkout 2019.1.x
+
+  if [[ -r project.clj ]]; then
+    configure_lein
+  fi
+}
+
