@@ -10,6 +10,13 @@ function pre_build_hook() {
   if [[ -r project.clj ]]; then
     configure_lein
   fi
+
+  if ! bundle_install_everything >> "$fossa_log" 2>&1; then
+    : ===
+    : === Error: "'bundle install' failed in $repo_url"
+    : ===
+    return 1
+  fi
 }
 
 ## build_hooks is mostly for compiled or combined builds that require make/Rake invocation
