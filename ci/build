@@ -205,6 +205,10 @@ fi
 echo "
 =========================
 Error Report
+
+"
+cat "$repos_in_error"
+echo "
 =========================
 "
 
