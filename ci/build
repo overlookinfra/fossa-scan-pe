@@ -12,6 +12,7 @@
 ##
 export WORKSPACE=${WORKSPACE:-$(pwd)}
 export PATH="$PATH:$WORKSPACE/bin"
+export GEM_SOURCE=https://rubygems.org
 
 git clean -ffdx
 
@@ -19,7 +20,6 @@ source /usr/local/rvm/scripts/rvm
 rvm use 2.5.1
 
 set -ex
-
 
 # Local directory definitions
 target_binary_directory="$WORKSPACE/bin"
@@ -166,7 +166,7 @@ while read -r repo_url; do
 
   # Apply hook overrides
   if [[ -r "$hook_file" ]]; then
-    : === Using "$hook_file"
+    : === Info: Using "$hook_file"
     source "$hook_file"
   fi
 
