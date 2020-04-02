@@ -78,8 +78,6 @@ function remove_git_sha() {
 function bundle_install_everything() {
   original_directory=$(pwd)
 
-  type bundle
-
   while read -r gemfile; do
     gemfile_directory=$(dirname "$gemfile")
     builtin cd "$gemfile_directory"
@@ -89,6 +87,7 @@ function bundle_install_everything() {
       return 1
     fi
   done < <(find "$original_directory" -name Gemfile | grep --fixed-string --invert-match .bundle/)
+
   builtin cd "$original_directory"
 }
 
@@ -173,17 +172,17 @@ while read -r repo_url; do
     source "$hook_file"
   fi
 
-  if ! pre_build_hook "$repo_url" >> "$fossa_log" 2>&1; then
+  pre_build_hook "$repo_url" 2>&1 | tee --append "$fossa_log"
+  if [[ ${PIPESTATUS[0]} != 0 ]]; then
     echo "$repo_url" >> "$repos_in_error"
     remove_git_sha "$repo_url"
-    cat "$fossa_log"
     continue
   fi
 
-  if ! build_hook "$repo_url" >> "$fossa_log" 2>&1; then
+  build_hook "$repo_url" 2>&1 | tee --append "$fossa_log"
+  if [[ ${PIPESTATUS[0]} != 0 ]]; then
     echo "$repo_url" >> "$repos_in_error"
     remove_git_sha "$repo_url"
-    cat "$fossa_log"
     continue
   fi
 
