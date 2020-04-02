@@ -150,7 +150,7 @@ while read -r repo_url; do
   : ===
   : === Info: Analyzing "$repo_url"
   : ===
-  git clone --recursive "$repo_url" "$repo_directory"
+  git clone --recurse-submodules "$repo_url" "$repo_directory"
   builtin cd "$repo_directory"
 
   current_sha=$(git rev-parse HEAD)
