@@ -24,7 +24,7 @@ set -ex
 # Local directory definitions
 target_binary_directory="$WORKSPACE/bin"
 temporary_directory="$WORKSPACE/tmp"
-hook_directory="$WORKSPACE/hooks"
+hook_directory="$WORKSPACE/ci/hooks"
 
 # Local file definitions
 

@@ -1,1 +1,0 @@
-function fossa_hook() { fossa --debug; }
