@@ -86,6 +86,11 @@ function bundle_install_everything() {
     if ! bundle install; then
       return 1
     fi
+    : =-=-=-=-=-=-=-=-=-=-= DEBUGGING
+    pwd
+    : $PWD
+    bundle list
+    : =-=-=-=-=-=-=-=-=-=-=
   done < <(find "$original_directory" -name Gemfile | grep --fixed-string --invert-match .bundle/)
 
   builtin cd "$original_directory"
