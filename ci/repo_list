@@ -44,6 +44,7 @@ git@github.com:puppetlabs/pe-puppetserver.git
 git@github.com:puppetlabs/pe-r10k-vanagon.git
 git@github.com:puppetlabs/pe-rbac-service.git
 git@github.com:puppetlabs/pe-tasks-vanagon.git
+git@github.com:puppetlabs/puppet-access.git
 git@github.com:puppetlabs/puppet-agent.git
 git@github.com:puppetlabs/puppet-code.git
 git@github.com:puppetlabs/puppetdb.git
