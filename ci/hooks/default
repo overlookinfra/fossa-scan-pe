@@ -11,7 +11,7 @@ function pre_build_hook() {
     configure_lein
   fi
 
-  bundle_install_everything 2>&1 | tee --append "$fossa_log"
+  bundle_install_everything
   if [[ ${PIPESTATUS[0]} != 0 ]]; then
     : ===
     : === Error: "'bundle install' failed in $repo_url"

@@ -84,16 +84,9 @@ function bundle_install_everything() {
   while read -r gemfile; do
     gemfile_directory=$(dirname "$gemfile")
     builtin cd "$gemfile_directory"
-    # export BUNDLE_PATH="$gemfile_directory/.bundle/gems"
-    # export BUNDLE_BIN="$gemfile_directory/.bundle/bin"
     if ! bundle install; then
       return 1
     fi
-    : =-=-=-=-=-=-=-=-=-=-= DEBUGGING
-    pwd
-    : $PWD
-    bundle list
-    : =-=-=-=-=-=-=-=-=-=-=
   done < <(find "$original_directory" -name Gemfile | grep --fixed-string --invert-match .bundle/)
 
   builtin cd "$original_directory"
@@ -215,12 +208,9 @@ fi
 echo "
 =========================
 Error Report
-
 "
 cat "$repos_in_error"
-echo "
-=========================
-"
+echo "========================="
 
 while read -r repo_url; do
   echo "======  $repo_url: "
