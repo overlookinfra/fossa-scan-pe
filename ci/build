@@ -29,6 +29,8 @@ hook_directory="$WORKSPACE/ci/hooks"
 export BUNDLE_PATH="$temporary_directory/bundle/gems"
 export BUNDLE_BIN="$temporary_directory/bundle/bin"
 
+DEFAULT_LEIN_VERSION=2.9.1
+
 # Local file definitions
 
 repo_list="$WORKSPACE/ci/repo_list"
@@ -94,7 +96,7 @@ function bundle_install_everything() {
 
 ## Set up lein if needed
 function configure_lein() {
-  lein_version=${1:-2.9.1}
+  lein_version=${1:-${DEFAULT_LEIN_VERSION}}
 
   if [[ -n $lein_version && -x /usr/local/bin/lein-$lein_version ]]; then
     export LEIN=/usr/local/bin/lein-$lein_version
