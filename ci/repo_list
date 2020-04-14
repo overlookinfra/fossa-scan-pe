@@ -1,3 +1,8 @@
+#git@github.com:puppetlabs/pe-console-auth-ui.git
+#git@github.com:puppetlabs/pe-console-services.git
+#git@github.com:puppetlabs/pe-console-ui.git
+#git@github.com:puppetlabs/leatherman.git
+#git@github.com:puppetlabs/facter.git
 git@github.com:puppetlabs/analytics-client.git
 git@github.com:puppetlabs/analytics.git
 git@github.com:puppetlabs/bouncer-validators.git
@@ -17,12 +22,10 @@ git@github.com:puppetlabs/code-manager.git
 git@github.com:puppetlabs/comidi.git
 git@github.com:puppetlabs/dujour-version-check.git
 git@github.com:puppetlabs/enterprise-dist.git
-git@github.com:puppetlabs/facter.git
 git@github.com:puppetlabs/hiera.git
 git@github.com:puppetlabs/jdbc-util.git
 git@github.com:puppetlabs/jruby-utils.git
 git@github.com:puppetlabs/jvm-ssl-utils.git
-git@github.com:puppetlabs/leatherman.git
 git@github.com:puppetlabs/liberator-util.git
 git@github.com:puppetlabs/orchestrator-client.git
 git@github.com:puppetlabs/orchestrator.git
@@ -30,9 +33,6 @@ git@github.com:puppetlabs/pcp-broker.git
 git@github.com:puppetlabs/pe-backup-tools-vanagon.git
 git@github.com:puppetlabs/pe-bolt-vanagon.git
 git@github.com:puppetlabs/pe-client-tools-vanagon.git
-git@github.com:puppetlabs/pe-console-auth-ui.git
-git@github.com:puppetlabs/pe-console-services.git
-git@github.com:puppetlabs/pe-console-ui.git
 git@github.com:puppetlabs/pe-file-sync.git
 git@github.com:puppetlabs/pe-installer-shim.git
 git@github.com:puppetlabs/pe-installer-vanagon.git
