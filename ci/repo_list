@@ -1,5 +1,5 @@
 #git@github.com:puppetlabs/pe-console-auth-ui.git
-#git@github.com:puppetlabs/pe-console-services.git
+git@github.com:puppetlabs/pe-console-services.git
 #git@github.com:puppetlabs/pe-console-ui.git
 #git@github.com:puppetlabs/leatherman.git
 #git@github.com:puppetlabs/facter.git

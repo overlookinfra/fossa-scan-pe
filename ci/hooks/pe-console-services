@@ -1,8 +1,12 @@
 function pre_build_hook() {
   git checkout 2019.1.x
-
-  if [[ -r project.clj ]]; then
-    configure_lein
-  fi
+  configure_lein
+  bundle_install_everything
 }
 
+function build_hook() {
+  export PE_VER=2019.1.x
+  export EZBAKE_NODEPLOY=true
+  export EZBAKE_ALLOW_UNREPRODUCIBLE_BUILDS=true
+  lein with-profile ezbake ezbake stage
+}

@@ -108,9 +108,9 @@ function configure_lein() {
   : ===
   lein_source_url=https://raw.githubusercontent.com/technomancy/leiningen/$lein_version/bin/lein
   lein_script_path="$target_binary_directory/lein"
+
   mkdir --parents "$target_binary_directory"
-  curl --fail --insecure --location --output "$lein_script_path" \
-       https://raw.githubusercontent.com/technomancy/leiningen/"$lein_version"/bin/lein
+  curl --fail --insecure --location --output "$lein_script_path" "$lein_source_url"
 
   if [[ ! -r $lein_script_path ]]; then
     : === Error: lein curl "$lein_source_url" failed.
@@ -118,7 +118,7 @@ function configure_lein() {
   fi
 
   chmod 755 "$lein_script_path"
-  export LEIN=$lein_script_path
+  export LEIN="$lein_script_path"
 }
 
 function install_fossa_cli() {
@@ -175,14 +175,14 @@ while read -r repo_url; do
     source "$hook_file"
   fi
 
-  pre_build_hook "$repo_url" 2>&1 | tee --append "$fossa_log"
+  pre_build_hook 2>&1 | tee --append "$fossa_log"
   if [[ ${PIPESTATUS[0]} != 0 ]]; then
     echo "$repo_url" >> "$repos_in_error"
     remove_git_sha "$repo_url"
     continue
   fi
 
-  build_hook "$repo_url" 2>&1 | tee --append "$fossa_log"
+  build_hook 2>&1 | tee --append "$fossa_log"
   if [[ ${PIPESTATUS[0]} != 0 ]]; then
     echo "$repo_url" >> "$repos_in_error"
     remove_git_sha "$repo_url"
@@ -190,7 +190,7 @@ while read -r repo_url; do
   fi
 
   set +e
-  fossa_hook "$repo_url" 2>&1 | tee --append "$fossa_log"
+  fossa_hook 2>&1 | tee --append "$fossa_log"
   if grep --silent "^FATAL " "$fossa_log"; then
     echo "$repo_url" >> "$repos_in_error"
     remove_git_sha "$repo_url"

@@ -5,19 +5,11 @@
 ## pre_build_hook handles local provisioning of build tools and files.
 ## It could also be for any needed fossa-specific configuration.
 function pre_build_hook() {
-  repo_url="$1"
-
   if [[ -r project.clj ]]; then
     configure_lein
   fi
 
   bundle_install_everything
-  if [[ ${PIPESTATUS[0]} != 0 ]]; then
-    : ===
-    : === Error: "'bundle install' failed in $repo_url"
-    : ===
-    return 1
-  fi
 }
 
 ## build_hooks is mostly for compiled or combined builds that require make/Rake invocation
