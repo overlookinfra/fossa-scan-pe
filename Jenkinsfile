@@ -27,8 +27,13 @@ pipeline {
   post {
     failure {
       slackSend channel: '#release-new-new',
-        color: 'warning',
+        color: 'danger',
         message: "Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]. See: ${env.BUILD_URL}"
+    }
+    fixed {
+      slackSend channel: '#release-new-new',
+        color: 'good',
+        message: "Repaired: ${env.JOB_NAME} [${env.BUILD_NUMBER}]. See: ${env.BUILD_URL}"
     }
   }
 }
