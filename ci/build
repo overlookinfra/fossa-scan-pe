@@ -58,9 +58,7 @@ function upload_git_sha_file() {
 # Given a repo name, retrieve the stored git sha
 function original_git_sha() {
   repo_name=$1
-  set +e
   grep "^$repo_name," "$original_git_sha_file_path" | awk -F, '{ print $2 }'
-  set -e
 }
 
 # Store a new git sha with a repo name into the git_sha file
