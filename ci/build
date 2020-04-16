@@ -19,7 +19,7 @@ git clean -ffdx
 source /usr/local/rvm/scripts/rvm
 rvm use 2.5.1
 
-set -ex
+set -x
 
 # Local directory definitions
 target_binary_directory="$WORKSPACE/bin"
@@ -132,15 +132,16 @@ function install_fossa_cli() {
   hash -r
 }
 
+function record_repo_error() {
+  repo_url="$1"
+  echo "$repo_url" >> "$repos_in_error"
+  remove_git_sha "$repo_url"
+}
 
 mkdir --parents "$target_binary_directory"
 mkdir --parents "$temporary_directory"
 
-set +e
-# It's OK if this fails.
 fetch_git_sha_file
-set -e
-
 install_fossa_cli
 
 ## Main loop. Process all the repos.
@@ -153,7 +154,14 @@ while read -r repo_url; do
   : ===
   : === Info: Analyzing "$repo_url"
   : ===
-  git clone --recurse-submodules "$repo_url" "$repo_directory"
+
+  if ! git clone --recurse-submodules "$repo_url" "$repo_directory"; then
+    : ===
+    : === Error: Could not clone "$repo_url". Skipping.
+    : ===
+    record_repo_error "$repo_url"
+    continue
+  fi
   builtin cd "$repo_directory"
 
   current_sha=$(git rev-parse HEAD)
@@ -177,29 +185,22 @@ while read -r repo_url; do
 
   pre_build_hook 2>&1 | tee --append "$fossa_log"
   if [[ ${PIPESTATUS[0]} != 0 ]]; then
-    echo "$repo_url" >> "$repos_in_error"
-    remove_git_sha "$repo_url"
+    record_repo_error "$repo_url"
     continue
   fi
 
   build_hook 2>&1 | tee --append "$fossa_log"
   if [[ ${PIPESTATUS[0]} != 0 ]]; then
-    echo "$repo_url" >> "$repos_in_error"
-    remove_git_sha "$repo_url"
+    record_repo_error "$repo_url"
     continue
   fi
 
-  set +e
   fossa_hook 2>&1 | tee --append "$fossa_log"
   if grep --silent "^FATAL " "$fossa_log"; then
-    echo "$repo_url" >> "$repos_in_error"
-    remove_git_sha "$repo_url"
+    record_repo_error "$repo_url"
   fi
-  set -e
   builtin cd "$WORKSPACE"
 done < <(grep --invert-match '^#' "$repo_list")
-
-set +ex
 
 upload_git_sha_file
 
