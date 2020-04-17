@@ -1,8 +1,5 @@
-#git@github.com:puppetlabs/pe-console-auth-ui.git
-git@github.com:puppetlabs/pe-console-services.git
 #git@github.com:puppetlabs/pe-console-ui.git
-#git@github.com:puppetlabs/leatherman.git
-#git@github.com:puppetlabs/facter.git
+#git@github.com:puppetlabs/pe-console-auth-ui.git
 git@github.com:puppetlabs/analytics-client.git
 git@github.com:puppetlabs/analytics.git
 git@github.com:puppetlabs/bouncer-validators.git
@@ -33,6 +30,7 @@ git@github.com:puppetlabs/pcp-broker.git
 git@github.com:puppetlabs/pe-backup-tools-vanagon.git
 git@github.com:puppetlabs/pe-bolt-vanagon.git
 git@github.com:puppetlabs/pe-client-tools-vanagon.git
+git@github.com:puppetlabs/pe-console-services.git
 git@github.com:puppetlabs/pe-file-sync.git
 git@github.com:puppetlabs/pe-installer-shim.git
 git@github.com:puppetlabs/pe-installer-vanagon.git
