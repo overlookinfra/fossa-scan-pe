@@ -1,0 +1,6 @@
+function pre_build_hook() {
+  bundle_install_everything
+  # There's only a Gemfile.lock there so we need to force it.
+  (cd modules/pe_nginx; bundle install)
+}
+
