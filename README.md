@@ -43,7 +43,7 @@ From https://app.fossa.com/components, select "Generate Report" from "Global Pac
 
 In the dialog, click `Start New Report`
 
-  * Scope: `PE Component`
+  * Scope: `PE Components`
   * Format: `CSV`
   * Project Data: `Package`, `Package Homepage`
   * License Detail: `Discovered License(s)`
