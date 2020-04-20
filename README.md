@@ -51,7 +51,7 @@ In the dialog, click `Start New Report`
 
 Click `Submit Report Job`.
 
-After a few minutes, you'll receive a CSV file in email. Save it in this directory.
+After a few minutes, you'll receive a CSV file in email. Download it somewhere on a local machine.
 
 ## Generate License HTML ##
 
