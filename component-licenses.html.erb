@@ -1,0 +1,27 @@
+<h2>FOSSA DERIVED LICENSE DATA FOR PUPPET ENTERPRISE</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th align="left">Package Title</th>
+      <th align="left">Version</th>
+      <th align="left">Declared License</th>
+      <th align="left">Discovered Licenses(s)</th>
+      <th align="left">Package Home Page</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% package_data.each do |package| %>
+    <tr>
+      <% package.each_with_index do |package_field, index| %>
+        <% if index == 4 %>
+          <td><a href="<%= package_field %>"><%= package_field %></a></td>
+        <% else %>
+          <td><%= package_field %></td>
+        <% end %>
+      <% end %>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

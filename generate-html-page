@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require 'csv'
+require 'erb'
+require 'optparse'
+
+ERB_TEMPLATE_FILE_NAME = "component-licenses.html.erb"
+
+script = File.basename($0)
+
+license_csv_file = ARGV.shift
+
+if license_csv_file.nil?
+  puts "Error: Usage: #{script} <fossa_csv_file>"
+  exit 1
+end
+
+unless FileTest.readable?(license_csv_file)
+  puts "#{script}: Error: Cannot read CSV file \"#{license_csv_file}\"."
+  exit 1
+end
+
+erb_template = File.read(ERB_TEMPLATE_FILE_NAME)
+erb_renderer = ERB.new(erb_template)
+erb_renderer.filename = ERB_TEMPLATE_FILE_NAME
+
+# Read the license CSV files, throw out any empty entries, sort by package name
+package_data = CSV.read(license_csv_file)
+                 .reject { |line| line.length == 0 }
+                 .sort { |a, b| a[0] <=> b[0] }
+
+puts erb_renderer.result(binding)
