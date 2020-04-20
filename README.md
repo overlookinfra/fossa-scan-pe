@@ -25,6 +25,9 @@ Most repos use the `default` hook file. Each hook file can contain any one of th
 These are written as bash shell functions. They are expected to send output to the standard
 output.
 
+You are not required to provide all hooks in a hook file. The default will always run if it
+has not been overriden.
+
 Two helper functions are available:
 
   * `configure_lein` This helper function will set up [leiningen](https://leiningen.org) in the
