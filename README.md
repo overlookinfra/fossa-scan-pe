@@ -7,9 +7,10 @@ The second is a semi-manual process needed to generate a license report.
 
 The [`fossa_scan_puppet-enterprise-components`](https://cinext-jenkinsmaster-pipeline-prod-1.delivery.puppetlabs.net/view/fossa/job/fossa_scan_puppet-enterprise-components/) Jenkins job runs daily.
 
-It scans the git repositories listed in `ci/repo_list`.
-
 It is controlled by the `Jenkinsfile` in this repository.
+
+It scans the git repositories listed in `ci/repo_list` in this repository.
+
 
 ### Repo-specific customizations  ###
 
