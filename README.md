@@ -19,8 +19,13 @@ The `ci/hooks` directory contains any hooks needed for special handling of repos
 Most repos use the `default` hook file. Each hook file can contain any one of three hooks:
 
   * `pre_build_hook`
+    This is used for any environmental setup such as installing software or setting variables.
   * `build_hook`
+    This hook is for creating build artifacts and pulling in artifact dependencies to the local
+    directory so that FOSSA can analyze them.
   * `fossa_hook`
+    This hook is for running FOSSA. It is used if the fossa CLI needs to be called with customized
+    flags.
 
 These are written as bash shell functions. They are expected to send output to the standard
 output.
