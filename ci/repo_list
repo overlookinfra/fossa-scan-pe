@@ -1,5 +1,4 @@
 #git@github.com:puppetlabs/pe-console-ui.git
-#git@github.com:puppetlabs/pe-console-auth-ui.git
 git@github.com:puppetlabs/analytics-client.git
 git@github.com:puppetlabs/analytics.git
 git@github.com:puppetlabs/bouncer-validators.git
