@@ -1,20 +1,6 @@
 function pre_build_hook() {
   git checkout 2019.1.x
   configure_lein
-
-  cat << EOF > .fossa.yml
-version: 2
-cli:
-  server: https://app.fossa.com
-  fetcher: custom
-  project: git@github.com:puppetlabs/pe-console-services.git
-analyze:
-  modules:
-  - name: project.clj
-    type: clojure
-    target: project.clj
-    path: .
-EOF
 }
 
 function build_hook() {

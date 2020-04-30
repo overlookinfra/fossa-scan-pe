@@ -15,7 +15,6 @@ pipeline {
   }
   environment {
     ARTIFACTORY_API_TOKEN = credentials('jenkins_artifactory_api_token')
-    FOSSA_API_KEY = credentials('fossa_api_key')
   }
   stages {
     stage('FOSSA Analyze') {

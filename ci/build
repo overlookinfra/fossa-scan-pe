@@ -28,6 +28,7 @@ hook_directory="$WORKSPACE/ci/hooks"
 
 export BUNDLE_PATH="$temporary_directory/bundle/gems"
 export BUNDLE_BIN="$temporary_directory/bundle/bin"
+export FOSSA_API_KEY=40fd6d65da7feb768e2223aed16a54bb
 
 DEFAULT_LEIN_VERSION=2.9.1
 
@@ -36,9 +37,9 @@ DEFAULT_LEIN_VERSION=2.9.1
 repo_list="$WORKSPACE/ci/repo_list"
 
 ## Keep a git_sha file so that we don't do unneeded scans
-git_sha_file_url=https://artifactory.delivery.puppetlabs.net/artifactory/scratchpad__local/fossa-scan-pe/git_sha_file.txt
-original_git_sha_file_path="$temporary_directory/original_git_sha_file.txt"
-updated_git_sha_file_path="$temporary_directory/git_sha_file.txt"
+git_sha_file_url=https://artifactory.delivery.puppetlabs.net/artifactory/scratchpad__local/fossa-scan-pe/git_sha_file_v2_experimental.txt
+original_git_sha_file_path="$temporary_directory/original_git_sha_file_v2_expermenntal.txt"
+updated_git_sha_file_path="$temporary_directory/git_sha_file_v2_experimental.txt"
 repos_in_error="$temporary_directory/repos_in_error"
 
 # Retrieve the git_sha_file from Artifactory
@@ -122,7 +123,7 @@ function configure_lein() {
 function install_fossa_cli() {
   # This is the script that will install FOSSA binary locally
   # From https://github.com/fossas/fossa-cli
-  fossa_install_script=https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh
+  fossa_install_script=https://raw.githubusercontent.com/fossas/spectrometer/master/install.sh
 
   curl --header 'Cache-Control:no-cache' $fossa_install_script > \
        "$target_binary_directory"/install.sh
