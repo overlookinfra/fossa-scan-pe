@@ -18,4 +18,4 @@ function build_hook() { true; }
 
 ## This should work for most cases but can be changed locally should fossa require additional
 ## command-line flags
-function fossa_hook() { fossa2 --verbose; }
+function fossa_hook() { fossa2 analyze; }
