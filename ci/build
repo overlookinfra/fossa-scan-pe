@@ -206,7 +206,7 @@ if [[ ! -r "$repos_in_error" ]]; then
   exit 0
 fi
 
-set + x
+set +x
 
 echo "
 =========================
