@@ -27,7 +27,7 @@ temporary_directory="$WORKSPACE/tmp"
 hook_directory="$WORKSPACE/ci/hooks"
 
 #export BUNDLE_PATH="$temporary_directory/bundle"
-export BUNDLE_BIN="$temporary_directory/bundle/bin"
+#export BUNDLE_BIN="$temporary_directory/bundle/bin"
 
 DEFAULT_LEIN_VERSION=2.9.1
 
@@ -84,7 +84,10 @@ function bundle_install_everything() {
   while read -r gemfile; do
     gemfile_directory=$(dirname "$gemfile")
     builtin cd "$gemfile_directory"
-    if ! bundle install --path .bundle; then
+    export BUNDLE_PATH=$(pwd)/.bundle/gems
+    export BUNDLE_BIN=$(pwd)/.bundle/bin
+
+    if ! bundle install; then
       return 1
     fi
   done < <(find "$original_directory" -name Gemfile | grep --fixed-string --invert-match .bundle/)
