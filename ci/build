@@ -27,7 +27,7 @@ temporary_directory="$WORKSPACE/tmp"
 hook_directory="$WORKSPACE/ci/hooks"
 
 #export BUNDLE_PATH="$temporary_directory/bundle"
-#export BUNDLE_BIN="$temporary_directory/bundle/bin"
+export BUNDLE_BIN="$temporary_directory/bundle/bin"
 
 DEFAULT_LEIN_VERSION=2.9.1
 
