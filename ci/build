@@ -149,6 +149,8 @@ while read -r repo_url; do
   hook_file="$hook_directory/$repo_basename"
   fossa_log="$temporary_directory/$repo_basename.log"
 
+  rm -rf "$BUNDLE_PATH" "$BUNDLE_BIN"
+
   : ===
   : === Info: Analyzing "$repo_url"
   : ===
