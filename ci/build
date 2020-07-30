@@ -26,8 +26,8 @@ target_binary_directory="$WORKSPACE/bin"
 temporary_directory="$WORKSPACE/tmp"
 hook_directory="$WORKSPACE/ci/hooks"
 
-export BUNDLE_PATH="$temporary_directory/bundle/gems"
-export BUNDLE_BIN="$temporary_directory/bundle/bin"
+#export BUNDLE_PATH="$temporary_directory/bundle/gems"
+#export BUNDLE_BIN="$temporary_directory/bundle/bin"
 
 DEFAULT_LEIN_VERSION=2.9.1
 
@@ -148,8 +148,6 @@ while read -r repo_url; do
   repo_directory="$WORKSPACE/$repo_basename"
   hook_file="$hook_directory/$repo_basename"
   fossa_log="$temporary_directory/$repo_basename.log"
-
-  rm -rf "$BUNDLE_PATH" "$BUNDLE_BIN"
 
   : ===
   : === Info: Analyzing "$repo_url"
