@@ -47,7 +47,7 @@ Two helper functions are available:
 
 ## Generate a FOSSA bill of materials report ##
 
-From https://app.fossa.com/components, select "Generate Report" from "Global Package Report Bundle".
+From https://app.fossa.com/reports, select "Generate Report" from "Global Package Report Bundle".
 
 In the dialog, click `Start New Report`
 
