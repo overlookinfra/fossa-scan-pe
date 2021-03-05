@@ -200,7 +200,7 @@ while read -r repo_url; do
     record_repo_error "$repo_url"
   fi
   builtin cd "$WORKSPACE"
-done < <(grep --invert-match '^#' ${repo_lists[@]})
+done < <(grep --invert-match --no-filename '^#' ${repo_lists[@]})
 
 upload_git_sha_file
 
