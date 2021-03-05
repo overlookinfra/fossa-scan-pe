@@ -1,0 +1,4 @@
+git@github.com:puppetlabs/remediate-logger.git
+git@github.com:puppetlabs/cloud-discovery.git
+git@github.com:puppetlabs/pdrp-providers.git
+git@github.com:puppetlabs/ps-blanket.git
