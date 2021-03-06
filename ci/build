@@ -88,6 +88,7 @@ function bundle_install_everything() {
     gemfile_directory=$(dirname "$gemfile")
     builtin cd "$gemfile_directory"
     if ! bundle install; then
+      builtin cd "$original_directory"
       return 1
     fi
   done < <(find "$original_directory" -name Gemfile | grep --fixed-string --invert-match .bundle/)
