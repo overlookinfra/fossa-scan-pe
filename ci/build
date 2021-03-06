@@ -17,7 +17,7 @@ export GEM_SOURCE=https://artifactory.delivery.puppetlabs.net/artifactory/api/ge
 git clean -ffdx
 
 source /usr/local/rvm/scripts/rvm
-rvm use 2.5.1
+rvm use 2.7.2
 
 set -x
 
@@ -29,7 +29,8 @@ hook_directory="$WORKSPACE/ci/hooks"
 export BUNDLE_PATH="$temporary_directory/bundle/gems"
 export BUNDLE_BIN="$temporary_directory/bundle/bin"
 
-DEFAULT_LEIN_VERSION=2.9.1
+
+DEFAULT_LEIN_VERSION=2.9.5
 
 # Local file definitions
 
