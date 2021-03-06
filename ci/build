@@ -35,7 +35,8 @@ DEFAULT_LEIN_VERSION=2.9.1
 
 pe_repo_list="$WORKSPACE/ci/pe_repo_list"
 cloud_content_ci_repo_list="$WORKSPACE/ci/cloud-content-ci_repo-list"
-repo_lists=($pe_repo_list $cloud_content_ci_repo_list)
+# repo_lists=($pe_repo_list $cloud_content_ci_repo_list)
+repo_lists=($cloud_content_ci_repo_list $pe_repo_list)
 
 ## Keep a git_sha file so that we don't do unneeded scans
 git_sha_file_url=https://artifactory.delivery.puppetlabs.net/artifactory/scratchpad__local/fossa-scan-pe/git_sha_file.txt
