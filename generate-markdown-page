@@ -20,13 +20,31 @@ unless FileTest.readable?(license_csv_file)
   exit 1
 end
 
+# The CSV file that FOSSA generates often has some issues. Clean them up
+# before trying to use it.
+
+processed_csv_filename = "processed_#{license_csv_file}"
+processed_file = File.open(processed_csv_filename, 'w')
+
+File.readlines(license_csv_file).each do |line|
+  # Sometimes there are lines with invalid headers containing no commas
+  next if line !~ /,/
+  # Often there are trailing commas, remove them
+  processed_file.puts line.chomp.chomp(',')
+end
+
+processed_file.close
+
 erb_template = File.read(ERB_TEMPLATE_FILE_NAME)
 erb_renderer = ERB.new(erb_template, nil, '-')
 erb_renderer.filename = ERB_TEMPLATE_FILE_NAME
 
 # Read the license CSV files, throw out any empty entries, sort by package name
-package_data = CSV.read(license_csv_file)
+# then join each line array with '|' for markdown tables.
+
+package_data = CSV.read(processed_csv_filename)
                  .reject { |line| line.length == 0 }
                  .sort { |a, b| a[0] <=> b[0] }
+                 .map { |line| line.join(' | ') }
 
 puts erb_renderer.result(binding)
