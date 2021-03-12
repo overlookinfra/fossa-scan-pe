@@ -1,0 +1,12 @@
+git@github.com:puppetlabs/relay-api.git
+git@github.com:puppetlabs/relay-core.git
+git@github.com:puppetlabs/relay-ui.git
+git@github.com:puppetlabs/relay-deploy.git
+git@github.com:puppetlabs/relay.git
+git@github.com:puppetlabs/relay-admin.git
+git@github.com:puppetlabs/relay-sdk-go.git
+git@github.com:puppetlabs/relay-sdk-python.git
+git@github.com:puppetlabs/relay-pls.git
+git@github.com:puppetlabs/puppetlabs-relay.git
+git@github.com:puppetlabs/leg.git
+git@github.com:puppetlabs/vault-plugin-secrets-oauthapp.git

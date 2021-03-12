@@ -1,0 +1,4 @@
+git@github.com:puppetlabs/puppet-forge-api.git
+git@github.com:puppetlabs/puppet-forge-web.git
+git@github.com:puppetlabs/forge-infra.git
+git@github.com:puppetlabs/forge-web.git
