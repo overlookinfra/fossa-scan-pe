@@ -1,6 +1,6 @@
 pipeline {
   agent {
-    label 'worker'
+    label 'k8s-worker'
   }
   triggers {
     cron('@daily')
