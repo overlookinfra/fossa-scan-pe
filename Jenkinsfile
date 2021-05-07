@@ -1,6 +1,6 @@
 pipeline {
   agent {
-    label 'worker'
+    label 'k8s-worker'
   }
   triggers {
     cron('@daily')
@@ -9,9 +9,7 @@ pipeline {
     timestamps()
     buildDiscarder(logRotator(numToKeepStr: '50'))
     timeout(time: 8, unit: 'HOURS')
-
-    // Works but in a later version than what we have; comment out for now
-    // ansiColor('xterm')
+    ansiColor('xterm')
   }
   environment {
     ARTIFACTORY_API_TOKEN = credentials('jenkins_artifactory_api_token')
