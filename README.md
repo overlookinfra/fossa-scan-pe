@@ -57,7 +57,7 @@ In the dialog, click `Start New Report`
   * License Detail: `License Template`, `Discovered License(s)`
   * Email: Your Email
 
-Not that you must use exactly the above selections, otherwise the HTML will be incorrectly
+Important Note: you must use exactly the above selections, otherwise the HTML will be incorrectly
 formatted.
 
 I hope to fix that in the future.
