@@ -4,7 +4,6 @@ git@github.com:puppetlabs/bouncer-validators.git
 git@github.com:puppetlabs/classifier.git
 git@github.com:puppetlabs/clj-http-client.git
 git@github.com:puppetlabs/clj-i18n.git
-git@github.com:puppetlabs/clj-jwt.git
 git@github.com:puppetlabs/clj-kitchensink.git
 git@github.com:puppetlabs/clj-ldap.git
 git@github.com:puppetlabs/clj-pcp-client.git
