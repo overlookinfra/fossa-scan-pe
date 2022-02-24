@@ -1,3 +1,7 @@
+# OBSOLETE
+
+FOSSA has been replaced with Snyk. This code is obsolete.
+
 # FOSSA SCAN PE Instructions #
 
 fossa-scan-pe contains two parts. The first is an daily automated scanner that runs on Jenkins.
